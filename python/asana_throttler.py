@@ -1,5 +1,4 @@
 from dataclasses import InitVar, dataclass, field
-from pprint import pprint
 import random
 import time
 import requests
@@ -81,7 +80,6 @@ class AsanaThrottler(_AsanaThrottlerDefaultsBase, RequestThrottler, _AsanaThrott
                 return response
 
             except requests.exceptions.HTTPError as http_err:
-                print('HTTP error occurred:', http_err)
                 if http_err.response.status_code == 429:
                     self._switch_api_key()
                     retry_after = int(http_err.response.headers.get('Retry-After', 0))
@@ -96,7 +94,6 @@ class AsanaThrottler(_AsanaThrottlerDefaultsBase, RequestThrottler, _AsanaThrott
                     raise
 
             except requests.exceptions.RequestException as req_err:
-                print('Request exception occurred:', req_err)
                 self._switch_api_key()
                 if attempt < retries - 1:
                     time.sleep((backoff_factor ** attempt) + random.uniform(0, 1))

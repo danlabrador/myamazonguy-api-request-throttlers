@@ -48,12 +48,8 @@ class HubSpotThrottler(_HubSpotThrottlerDefaultsBase, RequestThrottler, _HubSpot
 
     def _update_rate_limits(self, response):
         """Update the rate limits based on HubSpot's response headers."""
-        if 'X-HubSpot-RateLimit-Remaining' in response.headers:
-            requests_remaining = int(response.headers['X-HubSpot-RateLimit-Remaining'])
-            print(f"[RateLimit] Requests remaining in window: {requests_remaining}")
         if 'X-HubSpot-RateLimit-Interval-Milliseconds' in response.headers:
             self.rate_limit_window = int(response.headers['X-HubSpot-RateLimit-Interval-Milliseconds']) / 1000
-            print(f"[RateLimit] Rate limit window: {self.rate_limit_window} seconds")
         
         # Recalculate thresholds based on the updated rate limits
         self._recalculate_throttle_thresholds()
@@ -71,13 +67,8 @@ class HubSpotThrottler(_HubSpotThrottlerDefaultsBase, RequestThrottler, _HubSpot
                     method, url, headers=headers, params=params, data=data, json=json, retries=3
                 )
                 self.request_position = int(response.headers.get('X-HubSpot-RateLimit-Max', '150')) - int(response.headers.get('X-HubSpot-RateLimit-Remaining', '150'))
-                print(f"[RateLimit] Request max position in window: {int(response.headers.get('X-HubSpot-RateLimit-Max', '150'))}")
-                print(f"[RateLimit] Request remaining position in window: {int(response.headers.get('X-HubSpot-RateLimit-Remaining', '150'))}")
-                print(f"\033[94m[RateLimit] Request position in window: {self.request_position}\033[0m")
                 self._record_request()
-
                 self._update_rate_limits(response)
-
                 return response
 
             except requests.exceptions.HTTPError as http_err:

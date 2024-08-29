@@ -91,16 +91,12 @@ class TimeDoctorThrottler(_TimeDoctorThrottlerDefaultsBase, RequestThrottler):
             # Make the request
             try:
                 response = method_map[method](url, headers=headers, params=params, data=data)
-                print(f"[RateLimit] Request max position in window: {self.max_requests_in_window}")
-                print(f"[RateLimit] Request remaining position in window: {self.max_requests_in_window - self.request_position}")
-                print(f"\033[94m[RateLimit] Request position in window: {self.request_position}\033[0m")
                 response.raise_for_status()
                 self._record_request()
                 return response
     
             # Handle HTTP errors
             except requests.exceptions.HTTPError as http_err:
-                print(f"HTTPError: {http_err}")
                 if not self._is_transient_error(http_err.response.status_code, http_err.response):
                     raise
 
@@ -113,8 +109,7 @@ class TimeDoctorThrottler(_TimeDoctorThrottlerDefaultsBase, RequestThrottler):
                 else:
                     raise
     
-            except requests.exceptions.RequestException as req_err:
-                print(f"RequestException: {req_err}")
+            except requests.exceptions.RequestException:
                 if attempt < retries:
                     sleep_time = (backoff_factor ** attempt + 1) + random.uniform(0, 1)
                     time.sleep(sleep_time)

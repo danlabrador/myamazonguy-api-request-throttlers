@@ -1,6 +1,5 @@
 from collections import deque
 from dataclasses import dataclass, field
-from pprint import pprint
 import random
 import requests
 import time
@@ -80,7 +79,6 @@ class AirtableThrottler(_AirtableThrottlerDefaultsBase, RequestThrottler):
 
             # Handle HTTP errors
             except requests.exceptions.HTTPError as http_err:
-                print(f"HTTPError: {http_err}")
                 if not self._is_transient_error(http_err.response.status_code, http_err.response):
                     raise
 
@@ -102,8 +100,7 @@ class AirtableThrottler(_AirtableThrottlerDefaultsBase, RequestThrottler):
                 else:
                     raise
 
-            except requests.exceptions.RequestException as req_err:
-                print(f"RequestException: {req_err}")
+            except requests.exceptions.RequestException:
                 if attempt < retries:
                     sleep_time = (backoff_factor ** (attempt + 1)) + random.uniform(0, 1)
                     print(f"Request failed, retrying in {sleep_time:.2f} seconds")

@@ -15,7 +15,7 @@ The API Rate Limiter project offers a set of tools designed to help developers m
 To get started, clone the repository and explore the Python and JavaScript modules provided in their respective folders. These tools are designed for straightforward integration into your existing projects, helping you efficiently manage API requests with minimal setup.
 
 ```bash
-git clone https://github.com/MyamazonguyGithub/api-requests-throttling.git
+git clone https://github.com/danlabrador/myamazonguy-api-request-throttlers.git
 cd api-rate-limiter/python  # or javascript
 ```
 

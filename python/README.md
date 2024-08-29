@@ -1,8 +1,8 @@
-# API Rate Limiter
+# API Request Throttlers for Python
 
 ## Overview
 
-The API Rate Limiter project provides tools to help manage and control the rate at which API requests are made, ensuring compliance with rate limits and preventing overwhelming the server. The project includes classes for throttling requests, applying exponential backoff, and handling retries for transient errors.
+The API Request Throttlers for Python project provides tools to help manage and control the rate at which API requests are made, ensuring compliance with rate limits and preventing overwhelming the server. The project includes classes for throttling requests, applying exponential backoff, and handling retries for transient errors.
 
 ## Table of Contents
 

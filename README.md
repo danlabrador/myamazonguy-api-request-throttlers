@@ -1,8 +1,8 @@
-# API Rate Limiter Project
+# API Request Throttlers
 
 ## Overview
 
-The API Rate Limiter project offers a set of tools designed to help developers manage and control the rate of API requests in Python and JavaScript. These tools are essential for ensuring compliance with API rate limits, avoiding server overloads, and maintaining the stability of your applications.
+The API Request Throttlers offers a set of tools designed to help developers manage and control the rate of API requests in Python and JavaScript. These tools are essential for ensuring compliance with API rate limits, avoiding server overloads, and maintaining the stability of your applications.
 
 ## Repository Structure
 

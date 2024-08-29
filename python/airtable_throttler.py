@@ -1,21 +1,22 @@
 from collections import deque
 from dataclasses import dataclass, field
-import math
+from pprint import pprint
 import random
-import pytz
 import requests
 import time
 from datetime import datetime
-
 from python.throttler import RequestThrottler
+
+# If you are working with only one file, do not use the import statement above.
+# Instead, replace the import statement with the entire code snippet from the throttler.py file.
 
 @dataclass
 class _AirtableThrottlerDefaultsBase:
     """Default values for the AirtableThrottler class."""
     max_requests_in_window: int = 5  # requests per second
     rate_limit_window: int = 1  # in seconds
-    throttle_start_percentage: float = 0.60  # Start throttling at 60% of the limit
-    full_throttle_percentage: float = 0.80  # Fully throttle at 80% of the limit
+    throttle_start_percentage: float = 0.50  # Start throttling at 60% of the limit
+    full_throttle_percentage: float = 0.70  # Fully throttle at 80% of the limit
 
 
 @dataclass
@@ -29,12 +30,13 @@ class AirtableThrottler(_AirtableThrottlerDefaultsBase, RequestThrottler):
     request_timestamps: deque = field(default_factory=deque, init=False)
     total_requests_made: int = field(default=0, init=False)
     window_start_time: float = field(default_factory=time.time, init=False)
+    
 
     def __post_init__(self):
         """Initialize the API key and calculate throttle thresholds."""
         self._recalculate_throttle_thresholds()
         self.is_server_providing_request_position = False
-        self.is_leaky_bucket = False        
+        self.is_leaky_bucket = False       
 
     def _get_retry_after_seconds(self, retry_after_value):
         """Convert Retry-After value to seconds."""
@@ -71,7 +73,7 @@ class AirtableThrottler(_AirtableThrottlerDefaultsBase, RequestThrottler):
 
             # Make the request
             try:
-                response = method_map[method](url, headers=headers, params=params, data=data, json=json)
+                response = method_map[method](url, headers=headers, params=params, data=data, json=json)             
                 response.raise_for_status()
                 self._record_request()
                 return response

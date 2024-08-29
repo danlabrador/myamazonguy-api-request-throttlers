@@ -4,6 +4,7 @@ from pprint import pprint
 import time
 from collections import deque
 import random
+from tkinter import E
 import requests
 
 @dataclass
@@ -139,7 +140,12 @@ class RequestThrottler(_RequestThrottlerDefaultsBase):
             # Make the request
             try:
                 response = method_map[method](url, headers=headers, params=params, data=data)
-                response.raise_for_status()
+
+                try:
+                    response.raise_for_status()
+                except Exception as e:
+                    pprint(response.headers)
+                    raise e
                 self._record_request()
                 return response
     
@@ -151,6 +157,8 @@ class RequestThrottler(_RequestThrottlerDefaultsBase):
 
                 if 'Retry-After' in http_err.response.headers:
                     retry_after = int(http_err.response.headers['Retry-After'])
+                    print(f"Response has Retry-After header. ")
+                    print(f"Retrying after {retry_after} seconds.")
                     time.sleep(retry_after)
                 elif attempt < retries:
                     sleep_time = (backoff_factor ** (attempt + 1)) + random.uniform(0, 1)

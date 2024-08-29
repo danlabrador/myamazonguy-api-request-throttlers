@@ -10,6 +10,8 @@ The API Request Throttlers for Python project provides tools to help manage and 
 - [HubSpotThrottler](#hubspotthrottler)
 - [TimeDoctorThrottler](#timedoctorthrottler)
 - [AsanaThrottler](#asanathrottler)
+- [SlackThrottler](#slackthrottler)
+- [PackageThrottler](#packagethrottler)
 
 ## Classes
 
@@ -17,7 +19,7 @@ The API Request Throttlers for Python project provides tools to help manage and 
 
 The `RequestThrottler` class is designed to manage API request rate limiting by controlling the number of requests made within a specified time window. It supports dynamic throttling thresholds, exponential backoff, and jitter to ensure compliance with rate limits and prevent overwhelming the target server.
 
-#### Initialization of RequestThrottler
+#### Initialization - RequestThrottler
 
 ```python
 throttler = RequestThrottler(
@@ -33,7 +35,7 @@ throttler = RequestThrottler(
 - **`throttle_start_percentage` (float, optional)**: Percentage of the request limit at which throttling begins. Default is 75%.
 - **`full_throttle_percentage` (float, optional)**: Percentage of the request limit at which full throttling is applied. Default is 90%.
 
-#### RequestThrottler Methods
+#### Methods - RequestThrottler
 
 - **`throttled_get(url, headers=None, params=None)`**:
   - Makes a GET request with throttling applied.
@@ -42,12 +44,11 @@ throttler = RequestThrottler(
     - `headers` (dict, optional): Headers to include in the request.
     - `params` (dict, optional): Query parameters to include in the request.
 
-- **`throttled_post(url, data=None, json=None, headers=None, params=None)`**:
+- **`throttled_post(url, data=None, headers=None, params=None)`**:
   - Makes a POST request with throttling applied.
   - **Parameters**:
     - `url` (str): The URL for the POST request.
     - `data` (dict, optional): Data to include in the body of the POST request.
-    - `json` (dict, optional): JSON data to include in the body of the POST request.
     - `headers` (dict, optional): Headers to include in the request.
     - `params` (dict, optional): Query parameters to include in the request.
 
@@ -91,7 +92,7 @@ This example shows how to use the `RequestThrottler` class to make GET requests 
 
 The `HubSpotThrottler` class extends the functionality of `RequestThrottler` specifically for managing API requests to the HubSpot API. It dynamically adjusts to HubSpot's rate limits, introduces delays during high traffic to avoid hitting those limits, and switches between primary and backup API keys if a rate limit is reached.
 
-#### Initialization of HubSpotThrottler
+#### Initialization - HubSpotThrottler
 
 ```python
 hubspot_requester = HubSpotThrottler(
@@ -105,7 +106,7 @@ hubspot_requester = HubSpotThrottler(
 
 **Note**: You do not need to manually set `max_requests_in_window` and `rate_limit_window` for HubSpot, as these values are automatically retrieved from HubSpot's response headers. However, you can configure the other parameters like `throttle_start_percentage` and `full_throttle_percentage` as needed.
 
-#### HubSpotThrottler Methods
+#### Methods - HubSpotThrottler
 
 The `HubSpotThrottler` class has the same methods as the `RequestThrottler` class:
 
@@ -135,7 +136,7 @@ This example shows how to use the `HubSpotThrottler` class to manage API request
 
 The `TimeDoctorThrottler` class extends the functionality of `RequestThrottler` specifically for managing API requests to the Time Doctor API. It is designed to handle high traffic scenarios by introducing delays between requests when a large burst is detected, thereby reducing the likelihood of hitting the API rate limit. Additionally, if the rate limit is exceeded, the throttler is designed to switch to backup API keys to ensure continuous processing of requests.
 
-#### Initialization of TimeDoctorThrottler
+#### Initialization - TimeDoctorThrottler
 
 ```python
 time_doctor_requester = TimeDoctorThrottler()
@@ -143,7 +144,7 @@ time_doctor_requester = TimeDoctorThrottler()
 
 **Note**: The limits such as `max_requests_in_window`, `rate_limit_window`, `throttle_start_percentage`, and `full_throttle_percentage` are pre-configured and do not require manual setup.
 
-#### TimeDoctorThrottler Methods
+#### Methods - TimeDoctorThrottler
 
 The `TimeDoctorThrottler` class includes the following methods, inherited and customized from `RequestThrottler`:
 
@@ -173,17 +174,11 @@ for idx in range(1000):
 
 This example demonstrates how to use the `TimeDoctorThrottler` class to manage API requests to the Time Doctor API. The throttler automatically introduces delays and switches to backup API keys as needed to prevent hitting the rate limit.
 
-#### Important Considerations
-
-- **API Key Management**: The throttler handles API key management internally, ensuring that the appropriate API key is used for each request and that backup keys are available if the rate limit is exceeded.
-- **Error Handling**: The throttler is designed to handle transient errors by implementing retries with exponential backoff and jitter. This ensures that requests are resilient to temporary issues.
-- **Stress Testing**: The TimeDoctorThrottler is particularly useful in stress testing scenarios where a high volume of requests needs to be simulated. It ensures that the system remains within safe operational limits even under heavy load.
-
 ### AsanaThrottler
 
 The `AsanaThrottler` class extends the functionality of `RequestThrottler` specifically for managing API requests to the Asana API. It dynamically adjusts the delay between requests based on the `Retry-After` headers provided by Asana, ensuring that rate limits are respected. Like the `HubSpotThrottler`, it also has the ability to switch between primary and backup API keys when a rate limit is reached.
 
-#### Initialization of AsanaThrottler
+#### Initialization - AsanaThrottler
 
 ```python
 asana_requester = AsanaThrottler(
@@ -197,7 +192,7 @@ asana_requester = AsanaThrottler(
 
 **Note**: The `AsanaThrottler` automatically handles `Retry-After` headers provided by Asana and adjusts the request delays accordingly. The `max_requests_in_window` and `rate_limit_window` parameters are not required for this class, as the delay is dynamically set based on the `Retry-After` headers.
 
-#### AsanaThrottler Methods
+#### Methods - AsanaThrottler
 
 The `AsanaThrottler` class inherits the following methods from `RequestThrottler`:
 
@@ -230,11 +225,141 @@ for idx in range(200):
 
 This example shows how to use the `AsanaThrottler` class to manage API requests to Asana. The throttler will automatically apply delays based on the `Retry-After` headers returned by Asana and switch to backup API keys if the rate limit is reached.
 
-#### Important Considerations - AsanaThrottler
+### SlackThrottler
 
-- **`Retry-After` Handling**: The `AsanaThrottler` automatically adjusts the delay between requests based on the `Retry-After` headers, ensuring compliance with Asana's rate limits.
-- **API Key Management**: Similar to the `HubSpotThrottler`, the `AsanaThrottler` manages primary and backup API keys internally, switching as needed when rate limits are encountered.
-- **Error Handling**: The throttler also handles transient errors by implementing retries with exponential backoff and jitter, ensuring resilience against temporary issues.
-- **Stress Testing**: The `AsanaThrottler` is suitable for stress testing scenarios, where a high volume of requests is required, while still maintaining adherence to rate limits.
+The `SlackThrottler` class extends the functionality of `RequestThrottler` specifically for managing API requests to the Slack API. It handles dynamic rate limiting, introducing delays between requests to ensure compliance with Slack's rate limits. The `SlackThrottler` class is designed to manage the number of API requests within a specified time window, preventing the server from being overwhelmed.
 
-This section should integrate seamlessly with the existing documentation and provide a clear understanding of how the `AsanaThrottler` works, its initialization, usage, and important considerations.
+#### Initialization - SlackThrottler
+
+```python
+from throttler import SlackThrottler
+
+slack_requester = SlackThrottler(
+    max_requests_in_window=50, 
+    rate_limit_window=60
+)
+```
+
+- **`max_requests_in_window` (int)**: Maximum number of requests allowed within the time window.
+- **`rate_limit_window` (int, optional)**: The time window in seconds. Default is 1 second.
+- **`throttle_start_percentage` (float, optional)**: Percentage of the request limit at which throttling begins. Default is 75%.
+- **`full_throttle_percentage` (float, optional)**: Percentage of the request limit at which full throttling is applied. Default is 90%.
+
+#### Methods - SlackThrottler
+
+The `SlackThrottler` class inherits the following methods from `RequestThrottler`:
+
+- **`throttled_get(url, headers=None, params=None)`**
+- **`throttled_post(url, data=None, json=None, headers=None, params=None)`**
+- **`throttled_put(url, data=None, headers=None, params=None)`**
+- **`throttled_patch(url, data=None, headers=None, params=None)`**
+- **`throttled_delete(url, headers=None, params=None)`**
+
+#### Example Usage - SlackThrottler
+
+```python
+slack_requester = SlackThrottler(max_requests_in_window=20, rate_limit_window=60)
+
+for idx in range(100):
+    response = slack_requester.throttled_get('https://slack.com/api/conversations.list')
+    print(f"Making request {idx + 1}")
+    print(response.status_code)
+```
+
+This example demonstrates how to use the `SlackThrottler` class to manage API requests to Slack. The throttler automatically applies the necessary delays and backoff to ensure compliance with Slack's rate limits while handling a high volume of requests.
+
+### PackageThrottler
+
+The `PackageThrottler` class is a robust solution for managing operation throttling with built-in support for exponential backoff, jitter, and dynamic throttling thresholds. It is designed to control the rate at which operations are performed, ensuring compliance with rate limits and reducing the likelihood of overwhelming the server or hitting rate limits. This class is particularly useful in scenarios where you need to manage a high volume of operations efficiently while handling transient errors gracefully.
+
+#### Initialization - PackageThrottler
+
+```python
+gspread_throttler = PackageThrottler(
+    transient_exceptions=(gspread.exceptions.APIError),
+    max_operations_in_window=60,
+    rate_limit_window=60
+)
+```
+
+- **`transient_exceptions` (tuple)**: A tuple of exceptions that should be treated as transient and retried with exponential backoff.
+- **`max_operations_in_window` (int)**: Maximum number of operations allowed within the time window.
+- **`rate_limit_window` (int, optional)**: The time window in seconds. Default is 1 second.
+- **`throttle_start_percentage` (float, optional)**: Percentage of the operation limit at which throttling begins. Default is 75%.
+- **`full_throttle_percentage` (float, optional)**: Percentage of the operation limit at which full throttling is applied. Default is 90%.
+- **`base_backoff_delay` (float, optional)**: Base delay in seconds for exponential backoff. Default is 10 seconds.
+
+#### Methods - PackageThrottler
+
+The `PackageThrottler` class includes several methods to manage operation throttling effectively:
+
+- **`execute_with_throttle(client_instance, operation, *args, **kwargs)`**:
+  - Throttles and executes a client operation, handling retries with exponential backoff for transient errors.
+  - **Parameters**:
+    - `client_instance` (object): The client instance on which the operation is to be performed.
+    - `operation` (str): The operation to be executed on the client instance.
+    - `args` (tuple): Positional arguments to pass to the operation.
+    - `kwargs` (dict): Keyword arguments to pass to the operation.
+
+#### Example Usage - PackageThrottler
+
+```python
+from pprint import pprint
+from python.package_throttler import PackageThrottler
+from python.throttler import RequestThrottler
+import gspread
+import requests
+
+# Define the throttlers
+gspread_throttler = PackageThrottler(
+    transient_exceptions=(gspread.exceptions.APIError),
+    max_operations_in_window=60,
+    rate_limit_window=60,
+).execute_with_throttle
+
+throttled_get = RequestThrottler(
+    max_requests_in_window=60,
+    rate_limit_window=60,
+).throttled_get
+
+
+# Define the service account
+service_account = gspread_throttler(
+    gspread, 
+    'service_account_from_dict', 
+    {
+      # Your service account credentials
+    }
+)
+
+# Define the spreadsheet and worksheet
+spread = gspread_throttler(
+    service_account, 
+    'open_by_key',
+    '1Bd6axAIQ3K-6sy40pYtBSb7TVjO6q6zo4qYmZw0F8QI'
+)
+
+sheet1 = gspread_throttler(
+    spread, 
+    'get_worksheet_by_id',
+    0
+)
+
+# Get 1000 random users and append them to the sheet
+for _ in range(1000):
+    response = throttled_get('https://randomuser.me/api/')
+    user = response.json().get('results', {})[0]
+    name = f"{user.get('name', {}).get('first', '')} {user.get('name', {}).get('last', '')}"
+    email = user.get('email', '')
+    phone = user.get('phone', '')
+    gender = user.get('gender', '')
+
+    gspread_throttler(
+        sheet1,
+        'append_row',
+        values = [name, email, phone, gender],
+        value_input_option = 'USER_ENTERED'
+    )
+```
+
+This example demonstrates how to use the `PackageThrottler` class to manage a high volume of operations, such as interacting with the Google Sheets API (`gspread`) and making API requests. The throttler automatically applies the necessary delays, retries with exponential backoff for transient errors, and handles operations efficiently to prevent hitting rate limits.

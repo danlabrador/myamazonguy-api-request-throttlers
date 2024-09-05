@@ -1,8 +1,8 @@
-# API Request Throttlers
+# API Rate Limiter Project
 
 ## Overview
 
-The API Request Throttlers offers a set of tools designed to help developers manage and control the rate of API requests in Python and JavaScript. These tools are essential for ensuring compliance with API rate limits, avoiding server overloads, and maintaining the stability of your applications.
+The API Rate Limiter project offers a set of tools designed to help developers manage and control the rate of API requests in Python and JavaScript. These tools are essential for ensuring compliance with API rate limits, avoiding server overloads, and maintaining the stability of your applications.
 
 ## Repository Structure
 
@@ -15,7 +15,7 @@ The API Request Throttlers offers a set of tools designed to help developers man
 To get started, clone the repository and explore the Python and JavaScript modules provided in their respective folders. These tools are designed for straightforward integration into your existing projects, helping you efficiently manage API requests with minimal setup.
 
 ```bash
-git clone https://github.com/danlabrador/myamazonguy-api-request-throttlers.git
+git clone https://github.com/MyamazonguyGithub/api-rate-limiter.git
 cd api-rate-limiter/python  # or javascript
 ```
 

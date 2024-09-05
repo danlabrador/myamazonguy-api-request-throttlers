@@ -1,8 +1,8 @@
-# API Request Throttlers for Python
+# API Rate Limiter
 
 ## Overview
 
-The API Request Throttlers for Python project provides tools to help manage and control the rate at which API requests are made, ensuring compliance with rate limits and preventing overwhelming the server. The project includes classes for throttling requests, applying exponential backoff, and handling retries for transient errors.
+The API Rate Limiter project provides tools to help manage and control the rate at which API requests are made, ensuring compliance with rate limits and preventing overwhelming the server. The project includes classes for throttling requests, applying exponential backoff, and handling retries for transient errors.
 
 ## Table of Contents
 
@@ -11,6 +11,7 @@ The API Request Throttlers for Python project provides tools to help manage and 
 - [TimeDoctorThrottler](#timedoctorthrottler)
 - [AsanaThrottler](#asanathrottler)
 - [SlackThrottler](#slackthrottler)
+- [AirtableThrottler](#airtablethrottler)
 - [PackageThrottler](#packagethrottler)
 
 ## Classes
@@ -267,6 +268,41 @@ for idx in range(100):
 ```
 
 This example demonstrates how to use the `SlackThrottler` class to manage API requests to Slack. The throttler automatically applies the necessary delays and backoff to ensure compliance with Slack's rate limits while handling a high volume of requests.
+
+### AirtableThrottler
+
+The `AirtableThrottler` class extends the functionality of `RequestThrottler` specifically for managing API requests to the Airtable API. It is designed to handle dynamic rate limiting based on specified limits and response status codes, ensuring compliance with Airtable's rate limits while managing retries with exponential backoff for transient errors.
+
+#### Initialization - AirtableThrottler
+
+```python
+airtable_requester = AirtableThrottler()
+```
+
+**Note**: The limits such as `max_requests_in_window`, `rate_limit_window`, `throttle_start_percentage`, and `full_throttle_percentage` are pre-configured based on typical Airtable API usage patterns. However, these values can be adjusted as needed to better fit specific use cases.
+
+#### Methods - AirtableThrottler
+
+The `AirtableThrottler` class includes the following methods, inherited and customized from `RequestThrottler`:
+
+- **`throttled_get(url, headers=None, params=None)`**
+- **`throttled_post(url, data=None, json=None, headers=None, params=None)`**
+- **`throttled_put(url, data=None, headers=None, params=None)`**
+- **`throttled_patch(url, data=None, headers=None, params=None)`**
+- **`throttled_delete(url, headers=None, params=None)`**
+
+#### Example Usage - AirtableThrottler
+
+```python
+airtable_requester = AirtableThrottler()
+
+for idx in range(10):
+    response = airtable_requester.throttled_get('https://api.airtable.com/v0/appXXXXXXXXX/YourTableName')
+    print(f"Making request {idx + 1}")
+    print(response.status_code)
+```
+
+This example demonstrates how to use the `AirtableThrottler` class to manage API requests to Airtable. The throttler automatically applies the necessary delays, handles retries with exponential backoff, and manages the request rate to ensure compliance with Airtable's rate limits while processing a high volume of requests.
 
 ### PackageThrottler
 

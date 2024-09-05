@@ -4,7 +4,6 @@ from pprint import pprint
 import time
 from collections import deque
 import random
-from tkinter import E
 import requests
 
 @dataclass
